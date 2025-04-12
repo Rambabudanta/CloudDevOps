@@ -1,0 +1,31 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Clone Repo') {
+      steps {
+        git 'https://github.com/RustedIronn/SDCDevops.git'
+      }
+    }
+
+    stage('Install & Build') {
+      steps {
+        sh 'npm install'
+        sh 'npm run build'
+      }
+    }
+
+    stage('Docker Build') {
+      steps {
+        sh 'docker build -t react-cicd-app .'
+      }
+    }
+
+    stage('Run Docker Container') {
+      steps {
+        sh 'docker stop react-cicd-app || true && docker rm react-cicd-app || true'
+        sh 'docker run -d -p 3000:80 --name react-cicd-app react-cicd-app'
+      }
+    }
+  }
+}
